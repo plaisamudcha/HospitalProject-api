@@ -22,7 +22,7 @@ Backend API สำหรับระบบจัดการโรงพยา�
 • JWT Authentication
 • Role-based Authorization
 
-![ER-DIAGRAM](./src/assets/ER-diagram.jpg)
+![ER-DIAGRAM](./src/assets/ER-diagram.png)
 
 ## 🧠 System Overview
 
