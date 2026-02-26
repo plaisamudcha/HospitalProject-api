@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { HttpError } from '../utils/httpError';
 import jwt from 'jsonwebtoken';
 import { envConfig } from '../config/config';
-import { UserPayload } from '../types/auth/userPayload';
+import { UserPayload } from '../types/authType';
 
 export const authenticateHandler = (
   req: Request,

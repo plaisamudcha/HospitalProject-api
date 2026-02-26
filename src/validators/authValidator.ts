@@ -1,7 +1,7 @@
 import z from 'zod';
 import { validateHandler } from '../middlewares/validateHandler';
 
-const signUpSchema = z
+export const signUpSchema = z
   .object({
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
@@ -18,12 +18,10 @@ const signUpSchema = z
     message: 'Passwords do not match',
   });
 
-const signInSchema = z.object({
+export const signInSchema = z.object({
   email: z.string(),
   password: z.string(),
 });
 
-export type SignUpDtp = z.infer<typeof signUpSchema>;
-export type SignInDtp = z.infer<typeof signInSchema>;
 export const validateSignUp = validateHandler(signUpSchema);
 export const validateSignIn = validateHandler(signInSchema);
