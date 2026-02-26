@@ -1,137 +1,256 @@
-# CC20 My-Project (PoRPaI Health Care System) BACKEND
+# 🏥 CC20 – PoRPaI Health Care System (Backend)
+
+Backend API สำหรับระบบจัดการโรงพยาบาล
+พัฒนาโดยใช้ Node.js + Express + Prisma + PostgreSQL
+
+รองรับระบบ:
+
+• ระบบผู้ใช้งาน (Admin / Doctor / Patient)
+• ระบบนัดหมาย
+• ระบบบันทึกการรักษา
+• ระบบสั่งยา
+• ระบบจัดการสต็อกยา
+• ระบบออกใบแจ้งหนี้และชำระเงิน
+• Role-based Access Control (RBAC)
+
+## 📌 Tech Stack
+
+• Node.js
+• Express.js
+• Prisma ORM
+• PostgreSQL
+• JWT Authentication
+• Role-based Authorization
 
 ![ER-DIAGRAM](./src/assets/ER-diagram.jpg)
 
-## สรุป ER-DIAGRAM
+## 🧠 System Overview
 
-#### 1. ระบบผู้ใช้งาน (User System)
+#### 1️⃣ User System
 
-• ทุก ID ใช้ตาราง User ร่วมกัน (admin,doctor,patient)  
-• แยกข้อมูลเพิ่มเติมของหมอและคนไข้ตามตาราง doctor และ patient  
-• Admin เป็นคนสร้าง ID ของ doctor เท่านั้น  
-• patientId ลูกค้าเป็นคนสร้างเองหรือ admin สร้างให้  
-• login => ตรวจ role => ไปหน้า dashboard ตามสิทธิ์
+• ใช้ตาราง User ร่วมกันทุก Role (ADMIN, DOCTOR, PATIENT)
+• แยกข้อมูล Doctor และ Patient ออกเป็นคนละตาราง
+• Admin เป็นผู้สร้าง Doctor
+• Patient สมัครเองได้
+• Login → ตรวจสอบ role → เข้าหน้า dashboard ตามสิทธิ์
 
-#### 2. ระบบนัดหมาย (Appointment Flow)
+#### 2️⃣ Appointment System
 
-• Admin ลงเวลาจองนัดระหว่างคนไข้และหมอ  
-• หมอดูรายการนัดหมายของคนไข้ตัวเองได้ทั้งหมด  
-• ทุก AppointmentId จะเชื่อมโยงกับ PatientId และ DoctorId
+• Admin เป็นผู้สร้างนัดหมาย
+• Appointment เชื่อมกับ Doctor และ Patient
+• ป้องกันการจองซ้ำ (Doctor + ScheduleAt unique)
+• Doctor และ Patient ดูเฉพาะของตนเองได้
 
-#### 3. ระบบวินิจฉัยและสั่งยา (Medical Record & Prescription)
+#### 3️⃣ Medical Record & Prescription
 
-• หมอเป็นคนบันทึก Medical Record  
-• จากนั้นจึงสั่งยาผ่าน Prescription (สามารถสั่งหลายรายการต่อ 1 Medical Record ได้)
+• Doctor สร้าง Medical Record จาก Appointment
+• 1 Appointment = 1 Medical Record
+• 1 Medical Record สามารถมีหลาย Prescription
+• Prescription บันทึกราคา snapshot ป้องกันราคาเปลี่ยนย้อนหลัง
 
-- แต่ละ Prescription จะระบุ medicineId,dosage,duration
+#### 4️⃣ Medicine & Stock Management
 
-#### 4. ระบบจัดการยา (Medicine & PharmacyStockLog)
+• Medicine เก็บข้อมูลยา + ราคา + stock
+• ทุกการเปลี่ยนแปลง stock ต้องบันทึกใน StockLog
+• รองรับ transaction ป้องกัน stock ติดลบ
 
-• Medicine คือรายการยาทั้งหมดของโรงพยาบาล  
-• มี stock และ pricePerUnit กำกับอยู่  
-• ทุกครั้งที่มีการเพิ่มหรือลดยา จะต้องบันทึกใน PharmacyStockLog เพื่อข่วยให้ตรวจสอบได้
+#### 5️⃣ Billing System
 
-#### 5. ระบบชำระเงิน (Payment System)
+• หลังรักษา → สร้าง Invoice
+• Invoice สามารถมีหลาย Payment
+• รองรับ partial payment / retry / refund
+• Patient ดูสถานะการเงินของตนเองได้
 
-• หลังการรักษา => ระบบคำนวณยอดชำระ  
-• สร้างรายการใน Payment เชื่อมกับ appointmentId โดยมี amount,paymentMethod,paidAt,status  
-• ผู้ป่วยสามารถดูสถานะทางการเงินของตนเองได้
+## 🔐 Role-Based Access Control
 
-## Role-based Access Suggestion
+| Role    | Access                                                |
+| :------ | :---------------------------------------------------- |
+| ADMIN   | จัดการทุกระบบ                                         |
+| DOCTOR  | ดู appointment ตัวเอง / สร้าง medical record / สั่งยา |
+| PATIENT | ดู appointment / medical record / invoice ของตัวเอง   |
 
-| Role    | Access                                             |
-| :------ | :------------------------------------------------- |
-| Patient | Get only own appointment and payment               |
-| Doctor  | Create own medical record and prescription patient |
-| Admin   | Manage everything include register doctorId        |
+## 📂 API Structure
 
-## All Path for my project
+#### 🔑 AUTH MODULE
 
-#### Auth Path
+| Method | Endpoint                          | Auth   | Description            |
+| ------ | --------------------------------- | ------ | ---------------------- |
+| POST   | `/api/auth/login`                 | Public | Login                  |
+| POST   | `/api/auth/register/patient`      | Public | Register patient       |
+| POST   | `/api/auth/register/doctor`       | ADMIN  | Create doctor          |
+| GET    | `/api/auth/me`                    | USER   | Get current user       |
+| POST   | `/api/auth/forgot-password`       | Public | Send reset link        |
+| POST   | `/api/auth/reset-password/:token` | Public | Reset password         |
+| GET    | `/api/public/doctors`             | Public | Get public doctor list |
 
-| path                            | method | authen | params | query | body                                                 | response                                                                     | Description        |
-| :------------------------------ | :----- | :----- | :----- | :---- | :--------------------------------------------------- | :--------------------------------------------------------------------------- | :----------------- |
-| /api/auth/login                 | POST   | -      | -      | -     | {email,password}                                     | {message: "Login success, Welcome back ${firstName + lastName},accessToken"} | Login              |
-| /api/auth/register/doctor       | POST   | admin  | -      | -     | {firstName,lastName,email,password,specialization}   | {message: "Register success, Welcome ${firstName + lastName}"}               | Doctor's register  |
-| /api/auth/register/patient      | POST   | -      | -      | -     | {firstName,lastName,email,password,dob,gender,phone} | {message: "Register success, Welcome ${firstName + lastName}"}               | Patient's register |
-| /api/auth/me                    | GET    | user   | -      | -     | -                                                    | {message:"This is ${firstName + lastName}, Your role is ${role}"}            | Get user           |
-| /api/auth/forgot-password       | POST   | -      | -      | -     | {email}                                              | {message: "Reset link",link}                                                 | Forgot password    |
-| /api/auth/reset-password/:token | POST   | -      | token  | -     | {password}                                           | {message: "Reset password success}                                           | Reset password     |
-| /api/auth/publicDoctor          | GET    | -      | -      | -     | -                                                    | {doctors:[ ]}                                                                | Get public doctor  |
+#### 👨‍⚕️ DOCTOR (Admin Only)
 
-#### Doctor Path
+| Method | Endpoint                      | Description        |
+| ------ | ----------------------------- | ------------------ |
+| GET    | `/api/doctors`                | Get all doctors    |
+| GET    | `/api/doctors/:id`            | Get doctor by id   |
+| PUT    | `/api/doctors/:id`            | Update doctor      |
+| PATCH  | `/api/doctors/:id/deactivate` | Soft delete doctor |
 
-| path                   | method | authen | params   | query | body                                      | response                                            | Description              |
-| :--------------------- | :----- | :----- | :------- | :---- | :---------------------------------------- | :-------------------------------------------------- | :----------------------- |
-| /api/doctors           | GET    | admin  | -        | -     | -                                         | {allDoctors:[ ]}                                    | Get all doctors          |
-| /api/doctors/:doctorId | GET    | admin  | doctorId | -     | -                                         | {doctor:{ }}                                        | Get doctor by id         |
-| /api/doctors/:doctorId | PUT    | admin  | doctorId | -     | {firstName,lastName,email,specialization} | {message:"Update information success"}              | Update doctor by id      |
-| /api/doctors/:doctorId | PATCH  | admin  | doctorId | -     | {deletedAt: new Date()}                   | {message:"${firstName + lastName} has been deleted} | Soft delete doctor by id |
+#### 🧑‍⚕️ PATIENT (Admin Only)
 
-#### Patient Path
+| Method | Endpoint                       | Description         |
+| ------ | ------------------------------ | ------------------- |
+| GET    | `/api/patients`                | Get all patients    |
+| GET    | `/api/patients/:id`            | Get patient by id   |
+| PUT    | `/api/patients/:id`            | Update patient      |
+| PATCH  | `/api/patients/:id/deactivate` | Soft delete patient |
 
-| path                     | method | authen | params    | query | body                             | response                                                  | Description               |
-| :----------------------- | :----- | :----- | :-------- | :---- | :------------------------------- | :-------------------------------------------------------- | :------------------------ |
-| /api/patients            | GET    | admin  | -         | -     | -                                | {allPatients:[ ]}                                         | Get all patients          |
-| /api/patients/:patientId | GET    | admin  | patientId | -     | -                                | {Patient:{ }}                                             | Get patient by id         |
-| /api/patients/:patientId | PUT    | admin  | patientId | -     | {firstName,lastName,email,phone} | {message:"Update ${firstName + lastName} inform success"} | Update patient by id      |
-| /api/patients/patientId  | PATCH  | admin  | patientId | -     | {deletedAt: new Date()}          | {message:"Soft delete ${firstName + lastName} success}    | Soft delete patient by id |
+### 📅 APPOINTMENT
 
-#### Appointment Path
+| Method | Endpoint                       |
+| ------ | ------------------------------ |
+| GET    | `/api/appointments`            |
+| POST   | `/api/appointments`            |
+| PUT    | `/api/appointments/:id`        |
+| PATCH  | `/api/appointments/:id/status` |
+| DELETE | `/api/appointments/:id`        |
 
-| path                       | method | authen  | params | query | body                            | response                                                      | Description                       |
-| :------------------------- | :----- | :------ | :----- | :---- | :------------------------------ | :------------------------------------------------------------ | :-------------------------------- |
-| /api/appointments          | GET    | admin   | -      | -     | -                               | {allAppointments: [ ]}                                        | Get all appointments              |
-| /api/appointments/:id      | GET    | admin   | id     | -     | -                               | {appointments: [ ]}                                           | Get appointment by id             |
-| /api/appointments/doctors  | GET    | doctor  | -      | -     | -                               | {appointmentsByDoctorId: [ ]}                                 | Get appointment by doctorId       |
-| /api/appointments/patients | GET    | patient | -      | -     | -                               | {appointmentsByPatientId: [ ]}                                | Get appointment by patientId      |
-| /api/appointments          | POST   | admin   | -      | -     | {date,time,doctorId,patientId}  | {message: "Create appointment success",doctorName,clientName} | Create appointment                |
-| /api/appointments/:id      | DELETE | admin   | id     | -     | -                               | {message: "Cancel appointment success"}                       | Cancel appointment by id          |
-| /api/appointments/:id      | PUT    | admin   | id     | -     | {date,timed,doctorId,patientId} | {message:"Change appointment schedule success"}               | Change schedule appointment by id |
-| /api/appointments/:id      | PATCH  | admin   | id     | -     | {status}                        | {message: "Update appointment status success}                 | Update status appointment by id   |
+Example Body:
+{
+"scheduleAt": "2026-03-01T10:00:00Z",
+"doctorId": 1,
+"patientId": 2
+}
 
-#### Medical Path
+Doctor
+| Method | Endpoint |
+| ------ | -------------------------- |
+| GET | `/api/doctor/appointments` |
 
-| path                          | method | authen  | params | query | body                            | response                                               | Description                           |
-| :---------------------------- | :----- | :------ | :----- | :---- | :------------------------------ | :----------------------------------------------------- | :------------------------------------ |
-| /api/medical-records          | GET    | admin   | -      | -     | -                               | {allMedicalRecords: [ ]}                               | Get all medical records               |
-| /api/medical-records/:id      | GET    | admin   | id     | -     | -                               | {medicalRecord: { }}                                   | Get medical record by id              |
-| /api/medical-records          | POST   | doctor  | -      | -     | {diagnosis,notes,appointmentId} | {message: "create medical-record in ${appointmentId}"} | Create medical-record                 |
-| /api/medical-records/doctors  | GET    | doctor  | -      | -     | -                               | {allAppointmentInDoctorId : [ ]}                       | Get all medical records in doctor id  |
-| /api/medical-records/patients | GET    | patient | -      | -     | -                               | {allAppointmentInPatientId : [ ]}                      | Get all medical records in patient id |
+Patient
+| Method | Endpoint |
+| ------ | --------------------------- |
+| GET | `/api/patient/appointments` |
 
-### Prescription Path
+#### 🩺 MEDICAL RECORD
 
-| path                                | method | authen | params   | query | body                                          | response                                 | Description                       |
-| :---------------------------------- | :----- | :----- | :------- | :---- | :-------------------------------------------- | :--------------------------------------- | :-------------------------------- |
-| /api/prescriptions                  | GET    | admin  | -        | -     | -                                             | {allPrescriptions: [ ]}                  | Get all prescriptions             |
-| /api/prescriptions/:id              | GET    | admin  | id       | -     | -                                             | {prescription: { }}                      | Get prescription by id            |
-| /api/prescriptions                  | POST   | doctor | id       | -     | {dosage,duration,medicalReocordId,medicineId} | {message: "Create prescription success"} | Create new presciption            |
-| /api/prescriptions/doctor/:doctorId | GET    | doctor | doctorId | -     | -                                             | {allPrescriptionInDoctorId: [ ]}         | Get all prescription in doctor id |
-| /api/prescriptions/:id              | DELETE | doctor | id       | -     | -                                             | {message: "Delete prescription success}  | Delete prescription by id         |
+Admin
+| Method | Endpoint |
+| ------ | -------------------------- |
+| GET | `/api/medical-records` |
+| GET | `/api/medical-records/:id` |
 
-### Medicine Path
+Doctor
+| Method | Endpoint |
+| ------ | ----------------------------- |
+| POST | `/api/medical-records` |
+| GET | `/api/doctor/medical-records` |
 
-| path               | method | authen | params | query | body                                       | response                            | Description           |
-| :----------------- | :----- | :----- | :----- | :---- | :----------------------------------------- | :---------------------------------- | :-------------------- |
-| /api/medicines     | GET    | admin  | -      | -     | -                                          | {message: allMedicines: [ ]}        | Get all Medicines     |
-| /api/medicines/:id | GET    | admin  | id     | -     | -                                          | {message: medicine: { }}            | Get medicine by id    |
-| /api/medicines     | POST   | admin  | -      | -     | {name,description,stock,pricePerUnit,form} | {message:"Create medicine success"} | Create new medicine   |
-| /api/medicines/:id | PUT    | admin  | id     | -     | {name,description,stock,pricePerUnit,form} | {message:"Update medicine success}  | Update medicine by id |
+Example:
+{
+"appointmentId": 10,
+"diagnosis": "Flu",
+"notes": "Rest 3 days"
+}
 
-### Pharmacy Stock Log
+Patient
+| Method | Endpoint |
+| ------ | ------------------------------ |
+| GET | `/api/patient/medical-records` |
 
-| path                          | method | authen | params | query | body                       | response                                      | Description       |
-| :---------------------------- | :----- | :----- | :----- | :---- | :------------------------- | :-------------------------------------------- | :---------------- |
-| /api/stock-logs/medicines/:id | GET    | admin  | id     | -     | -                          | {pharmacyStocks: [ ]}                         | Get all stock log |
-| /api/stock-logs               | POST   | admin  | id     | -     | {change,reason,medicineId} | {message: ${medicineId} stock create success} | Create stock log  |
+### 💊 PRESCRIPTION
 
-### Payment
+Admin
+| Method | Endpoint |
+| ------ | ------------------------ |
+| GET | `/api/prescriptions` |
+| GET | `/api/prescriptions/:id` |
 
-| path                  | method | authen  | params | query | body                                           | response                            | Description                     |
-| :-------------------- | :----- | :------ | :----- | :---- | :--------------------------------------------- | :---------------------------------- | :------------------------------ |
-| /api/payments         | GET    | admin   | -      | -     | -                                              | {allPayments: [ ]}                  | Get all payment                 |
-| /api/payments/:id     | GET    | admin   | id     | -     | -                                              | {payment: { }}                      | Get payment by id               |
-| /api/payments         | POST   | admin   | -      | -     | {amount,paymentMethod,patientId,appointmentId} | -                                   | Create payment                  |
-| /api/payments/:id     | PATCH  | admin   | id     | -     | {status}                                       | {message: "Update payment success"} | Cancel or update payment status |
-| /api/payments/patient | GET    | patient | -      | -     | -                                              | {allPatmentsInPatientId: [ ]}       | Get all payment in patient id   |
+Doctor
+| Method | Endpoint |
+| ------ | --------------------------- |
+| POST | `/api/prescriptions` |
+| DELETE | `/api/prescriptions/:id` |
+| GET | `/api/doctor/prescriptions` |
+
+Example:
+{
+"medicalRecordId": 5,
+"medicineId": 3,
+"dosage": "1 tablet",
+"duration": "5 days",
+"quantity": 10
+}
+
+### 💊 MEDICINE (Admin Only)
+
+| Method | Endpoint                        |
+| ------ | ------------------------------- |
+| GET    | `/api/medicines`                |
+| GET    | `/api/medicines/:id`            |
+| POST   | `/api/medicines`                |
+| PUT    | `/api/medicines/:id`            |
+| PATCH  | `/api/medicines/:id/deactivate` |
+
+### 📦 STOCK LOG (Admin Only)
+
+| Method | Endpoint                        |
+| ------ | ------------------------------- |
+| GET    | `/api/medicines/:id/stock-logs` |
+| POST   | `/api/stock-logs`               |
+
+Example:
+{
+"medicineId": 3,
+"change": -5,
+"reason": "Prescription #22"
+}
+
+### 💰 BILLING SYSTEM
+
+Invoice
+| Method | Endpoint | Auth |
+| ------ | ----------------------- | ------- |
+| GET | `/api/invoices` | ADMIN |
+| GET | `/api/invoices/:id` | ADMIN |
+| GET | `/api/patient/invoices` | PATIENT |
+
+Payment
+| Method | Endpoint | Auth |
+| ------ | -------------------------- | ------- |
+| POST | `/api/payments` | ADMIN |
+| PATCH | `/api/payments/:id/status` | ADMIN |
+| GET | `/api/payments` | ADMIN |
+| GET | `/api/patient/payments` | PATIENT |
+
+Example:
+{
+"invoiceId": 1,
+"amount": 1500.00,
+"paymentMethod": "PROMPTPAY"
+}
+
+## 🔒 Security Design
+
+• JWT Authentication
+• Role-based Authorization Middleware
+• Doctor/Patient เข้าถึงเฉพาะข้อมูลตนเอง
+• ใช้ Decimal ป้องกัน precision error ด้านการเงิน
+• ใช้ Database Constraint ป้องกัน double booking
+
+## 🚀 Future Improvements
+
+• File upload (Lab result / X-ray)
+• Doctor schedule management
+• Medicine batch & expiry tracking
+• Payment gateway integration
+• Audit log system
+
+## 🏗 Architecture Pattern
+
+• Controller Layer
+• Service Layer
+• Repository (Prisma)
+• Middleware (Auth + RBAC)
+• Centralized Error Handler
+
+## 🧩 Project Status
+
+• Production-ready backend architecture
+• รองรับการขยายระบบในอนาคตได้
