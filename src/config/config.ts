@@ -9,6 +9,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES: z.coerce.number().min(1),
+  JWT_REFRESH_EXPIRES: z.coerce.number().min(1),
 });
 
 const { success, data, error } = envSchema.safeParse(process.env);
