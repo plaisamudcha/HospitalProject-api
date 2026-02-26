@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
-
-export interface AppError extends Error {
-  status?: number;
-}
+import { HttpError } from '../utils/httpError';
 
 export const errorHandler = (
-  err: AppError,
+  err: unknown,
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   console.error(err);
-  res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error',
-  });
+  if (err instanceof HttpError) {
+    res.status(err.statusCode).json({ message: err.message });
+  }
+  if (err instanceof Error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+  res.status(500).json({ message: 'Internal Server Error' });
 };
