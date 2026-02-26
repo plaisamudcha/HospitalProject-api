@@ -1,5 +1,5 @@
 import app from './app';
-import config from './config/config';
+import { envConfig } from './config/config';
 
 type ListenError = Error & {
   syscall?: string;
@@ -8,9 +8,9 @@ type ListenError = Error & {
 
 type ShutdownSignal = 'SIGINT' | 'SIGTERM';
 
-const server = app.listen(config.port, () => {
+const server = app.listen(envConfig.PORT, () => {
   console.log(
-    `Server is running on port ${config.port} in ${config.nodeEnv} mode.`,
+    `Server is running on port ${envConfig.PORT} in ${envConfig.NODE_ENV} mode.`,
   );
 });
 
@@ -20,9 +20,9 @@ server.on('error', (error: ListenError) => {
   }
 
   const bind =
-    typeof config.port === 'string'
-      ? `Pipe ${config.port}`
-      : `Port ${config.port}`;
+    typeof envConfig.PORT === 'string'
+      ? `Pipe ${envConfig.PORT}`
+      : `Port ${envConfig.PORT}`;
 
   switch (error.code) {
     case 'EACCES':
