@@ -118,6 +118,10 @@ Example Body:
 "patientId": 2
 }
 
+Example:
+
+- [examples/appointment.json](examples/appointment.json)
+
 Doctor
 | Method | Endpoint |
 | ------ | -------------------------- |
@@ -143,11 +147,8 @@ Doctor
 | GET | `/api/doctor/medical-records` |
 
 Example:
-{
-"appointmentId": 10,
-"diagnosis": "Flu",
-"notes": "Rest 3 days"
-}
+
+- [examples/medical-record.json](examples/medical-record.json)
 
 Patient
 | Method | Endpoint |
@@ -170,13 +171,8 @@ Doctor
 | GET | `/api/doctor/prescriptions` |
 
 Example:
-{
-"medicalRecordId": 5,
-"medicineId": 3,
-"dosage": "1 tablet",
-"duration": "5 days",
-"quantity": 10
-}
+
+- [examples/prescription.json](examples/prescription.json)
 
 ### 💊 MEDICINE (Admin Only)
 
