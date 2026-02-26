@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type SuccessApiResponse<T> = {
-  success: true;
-  message?: string;
-  data: T;
-};
+export type SuccessApiResponse<T = void> = T extends void
+  ? {
+      success: true;
+      message?: string;
+    }
+  : {
+      success: true;
+      message?: string;
+      data: T;
+    };
 
 export enum HttpStatusCode {
   OK = 200,
@@ -24,4 +29,4 @@ export type ErrorApiResponse = {
   detail?: any;
 };
 
-export type ApiResponse<T> = SuccessApiResponse<T> | ErrorApiResponse;
+export type ApiResponse<T = void> = SuccessApiResponse<T> | ErrorApiResponse;
