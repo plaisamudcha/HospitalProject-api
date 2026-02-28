@@ -19,7 +19,6 @@ enum RoleType {
 enum Gender {
   MALE
   FEMALE
-  OTHER
 }
 
 enum DoctorType {
@@ -83,15 +82,17 @@ enum InvoiceStatus {
 //////////////////////////////////////////////////////
 
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String   @unique
-  password  String
-  role      RoleType @default(PATIENT)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int       @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  email        String    @unique
+  password     String
+  role         RoleType  @default(PATIENT)
+  isActive     Boolean   @default(true)
+  profileImage String?
+  deletedAt    DateTime? @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   patient       Patient?
   doctor        Doctor?
@@ -175,13 +176,13 @@ model MedicalRecord {
 //////////////////////////////////////////////////////
 
 model Prescription {
-  id        Int      @id @default(autoincrement())
-  dosage    String
-  duration  String
-  quantity  Int
+  id       Int    @id @default(autoincrement())
+  dosage   String
+  duration String
+  quantity Int
 
-  unitPrice  Decimal @db.Decimal(10,2)
-  totalPrice Decimal @db.Decimal(10,2)
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
 
   medicalRecordId Int
   medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
@@ -197,12 +198,12 @@ model Prescription {
 //////////////////////////////////////////////////////
 
 model Medicine {
-  id           Int      @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   name         String
   description  String
   form         MedicineForm
-  stock        Int      @default(0)
-  pricePerUnit Decimal  @db.Decimal(10,2)
+  stock        Int          @default(0)
+  pricePerUnit Decimal      @db.Decimal(10, 2)
 
   prescriptions Prescription[]
   stockLogs     PharmacyStockLog[]
@@ -230,7 +231,7 @@ model PharmacyStockLog {
 
 model Invoice {
   id          Int           @id @default(autoincrement())
-  totalAmount Decimal       @db.Decimal(10,2)
+  totalAmount Decimal       @db.Decimal(10, 2)
   status      InvoiceStatus @default(DRAFT)
   issuedAt    DateTime?
   paidAt      DateTime?
@@ -246,12 +247,12 @@ model Invoice {
 //////////////////////////////////////////////////////
 
 model Payment {
-  id            Int           @id @default(autoincrement())
-  amount        Decimal       @db.Decimal(10,2)
-  status        PaymentStatus @default(PENDING)
+  id            Int            @id @default(autoincrement())
+  amount        Decimal        @db.Decimal(10, 2)
+  status        PaymentStatus  @default(PENDING)
   paymentMethod PaymentMethod?
   paidAt        DateTime?
-  createdAt     DateTime      @default(now())
+  createdAt     DateTime       @default(now())
 
   invoiceId Int
   invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
