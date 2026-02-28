@@ -1,7 +1,12 @@
-import { SignUpDoctorDto, SignUpPatientDto } from '../types/authType';
+import {
+  SignInDto,
+  SignUpDoctorDto,
+  SignUpPatientDto,
+} from '../types/authType';
 import bcrypt from 'bcryptjs';
 import prisma from '../config/prisma';
 import { envConfig } from '../config/config';
+import userService from './userService';
 
 const authService = {
   signUpPatient: async (data: SignUpPatientDto) => {
@@ -43,6 +48,23 @@ const authService = {
             specialization: data.specialization,
           },
         },
+      },
+    });
+  },
+  signInUser: async (data: SignInDto) => {
+    const user = await userService.findExistingUser(data.email);
+
+    if (!user) return null;
+    const isPasswordValid = await bcrypt.compare(data.password, user.password);
+
+    return isPasswordValid ? user : null;
+  },
+  createRefreshToken: async (userId: number, refreshToken: string) => {
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId,
+        expiresAt: new Date(Date.now() + envConfig.JWT_REFRESH_EXPIRES * 1000), // Set expiration time
       },
     });
   },

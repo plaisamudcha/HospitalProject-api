@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 import { HttpError } from '../utils/httpError';
+import { HttpStatusCode } from '../types/apiType';
 
 export const errorHandler = (
   err: unknown,
@@ -13,7 +14,11 @@ export const errorHandler = (
     res.status(err.statusCode).json({ message: err.message });
   }
   if (err instanceof Error) {
-    res.status(500).json({ message: 'Internal Server Error' });
+    res
+      .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: 'Internal Server Error' });
   }
-  res.status(500).json({ message: 'Internal Server Error' });
+  res
+    .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+    .json({ message: 'Internal Server Error' });
 };

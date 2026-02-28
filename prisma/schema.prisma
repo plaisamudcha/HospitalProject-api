@@ -82,7 +82,7 @@ enum InvoiceStatus {
 //////////////////////////////////////////////////////
 
 model User {
-  id           Int       @id @default(autoincrement())
+  id           String    @id @default(uuid())
   firstName    String
   lastName     String
   email        String    @unique
@@ -106,13 +106,13 @@ model User {
 //////////////////////////////////////////////////////
 
 model Patient {
-  id     Int      @id @default(autoincrement())
+  id     String   @id @default(uuid())
   dob    DateTime
   gender Gender
   phone  String
 
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
 }
@@ -122,11 +122,11 @@ model Patient {
 //////////////////////////////////////////////////////
 
 model Doctor {
-  id             Int        @id @default(autoincrement())
+  id             String     @id @default(uuid())
   specialization DoctorType
 
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
 }
@@ -136,15 +136,15 @@ model Doctor {
 //////////////////////////////////////////////////////
 
 model Appointment {
-  id         Int               @id @default(autoincrement())
+  id         String            @id @default(uuid())
   scheduleAt DateTime
   status     AppointmentStatus @default(SCHEDULED)
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 
-  doctorId  Int
+  doctorId  String
   doctor    Doctor  @relation(fields: [doctorId], references: [id])
-  patientId Int
+  patientId String
   patient   Patient @relation(fields: [patientId], references: [id])
 
   medicalRecord MedicalRecord?
@@ -160,12 +160,12 @@ model Appointment {
 //////////////////////////////////////////////////////
 
 model MedicalRecord {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   diagnosis String
   notes     String
   createdAt DateTime @default(now())
 
-  appointmentId Int         @unique
+  appointmentId String      @unique
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
   prescriptions Prescription[]
@@ -176,7 +176,7 @@ model MedicalRecord {
 //////////////////////////////////////////////////////
 
 model Prescription {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(uuid())
   dosage   String
   duration String
   quantity Int
@@ -184,10 +184,10 @@ model Prescription {
   unitPrice  Decimal @db.Decimal(10, 2)
   totalPrice Decimal @db.Decimal(10, 2)
 
-  medicalRecordId Int
+  medicalRecordId String
   medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
 
-  medicineId Int
+  medicineId String
   medicine   Medicine @relation(fields: [medicineId], references: [id])
 
   @@index([medicalRecordId])
@@ -198,7 +198,7 @@ model Prescription {
 //////////////////////////////////////////////////////
 
 model Medicine {
-  id           Int          @id @default(autoincrement())
+  id           String       @id @default(uuid())
   name         String
   description  String
   form         MedicineForm
@@ -214,12 +214,12 @@ model Medicine {
 //////////////////////////////////////////////////////
 
 model PharmacyStockLog {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   change    Int
   reason    String
   createdAt DateTime @default(now())
 
-  medicineId Int
+  medicineId String
   medicine   Medicine @relation(fields: [medicineId], references: [id])
 
   @@index([medicineId])
@@ -230,13 +230,13 @@ model PharmacyStockLog {
 //////////////////////////////////////////////////////
 
 model Invoice {
-  id          Int           @id @default(autoincrement())
+  id          String        @id @default(uuid())
   totalAmount Decimal       @db.Decimal(10, 2)
   status      InvoiceStatus @default(DRAFT)
   issuedAt    DateTime?
   paidAt      DateTime?
 
-  appointmentId Int         @unique
+  appointmentId String      @unique
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
   payments Payment[]
@@ -247,14 +247,14 @@ model Invoice {
 //////////////////////////////////////////////////////
 
 model Payment {
-  id            Int            @id @default(autoincrement())
+  id            String         @id @default(uuid())
   amount        Decimal        @db.Decimal(10, 2)
   status        PaymentStatus  @default(PENDING)
   paymentMethod PaymentMethod?
   paidAt        DateTime?
   createdAt     DateTime       @default(now())
 
-  invoiceId Int
+  invoiceId String
   invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId])
@@ -265,15 +265,15 @@ model Payment {
 //////////////////////////////////////////////////////
 
 model RefreshToken {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   token     String   @unique
   createdAt DateTime @default(now())
   expiresAt DateTime
   ipAddress String?
   userAgent String?
 
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
