@@ -3,6 +3,7 @@ import {
   validateForgotPassword,
   validateResetPassword,
   validateSignIn,
+  validateSignUpAdmin,
   validateSignUpDoctor,
   validateSignUpPatient,
 } from '../validators/authValidator';
@@ -12,6 +13,11 @@ import checkRoleHandler from '../middlewares/checkRoleHandler';
 
 const authRoute = Router();
 
+authRoute.post(
+  '/signup/admin',
+  validateSignUpAdmin,
+  authController.signUpAdmin,
+);
 authRoute.post(
   '/signup/patient',
   validateSignUpPatient,

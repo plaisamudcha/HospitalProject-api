@@ -1,0 +1,16 @@
+meta {
+  name: signupDoctor
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/api/auth/signup/doctor
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
