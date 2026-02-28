@@ -1,5 +1,6 @@
 import {
   SignInDto,
+  SignUpAdminDto,
   SignUpDoctorDto,
   SignUpPatientDto,
 } from '../types/authType';
@@ -9,6 +10,23 @@ import { envConfig } from '../config/config';
 import userService from './userService';
 
 const authService = {
+  signUpAdmin: async (data: SignUpAdminDto) => {
+    const hashedPassword = await bcrypt.hash(
+      data.password,
+      envConfig.BCRYPT_SALT_ROUNDS,
+    );
+
+    await prisma.user.create({
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: hashedPassword,
+        role: 'ADMIN',
+        profileImage: data.profileImage || null,
+      },
+    });
+  },
   signUpPatient: async (data: SignUpPatientDto) => {
     const hashedPassword = await bcrypt.hash(
       data.password,
@@ -21,6 +39,8 @@ const authService = {
         lastName: data.lastName,
         email: data.email,
         password: hashedPassword,
+        role: 'PATIENT',
+        profileImage: data.profileImage || null,
         patient: {
           create: {
             dob: data.dob,
@@ -43,6 +63,8 @@ const authService = {
         lastName: data.lastName,
         email: data.email,
         password: hashedPassword,
+        role: 'DOCTOR',
+        profileImage: data.profileImage || null,
         doctor: {
           create: {
             specialization: data.specialization,

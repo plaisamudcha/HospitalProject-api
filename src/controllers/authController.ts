@@ -7,6 +7,7 @@ import {
   ForgotPasswordDto,
   ResetPasswordDto,
   SignInDto,
+  SignUpAdminDto,
   SignUpDoctorDto,
   SignUpPatientDto,
   UserPayload,
@@ -19,6 +20,17 @@ import userService from '../services/userService';
 import sendResetPasswordEmail from '../utils/resetPassword';
 
 const authController = {
+  signUpAdmin: async (
+    req: Request<{}, ApiResponse, SignUpAdminDto>,
+    res: Response<ApiResponse>,
+  ): Promise<void> => {
+    await authService.signUpAdmin(req.body);
+
+    res.status(HttpStatusCode.CREATED).json({
+      success: true,
+      message: 'Admin registered successfully',
+    });
+  },
   signUpPatient: async (
     req: Request<{}, ApiResponse, SignUpPatientDto>,
     res: Response<ApiResponse>,

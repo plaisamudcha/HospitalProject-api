@@ -5,6 +5,7 @@ import {
   signInSchema,
   signUpDoctorSchema,
   signUpPatientSchema,
+  singUpAdminScheme,
 } from '../validators/authValidator';
 import { RoleType } from '@prisma/client';
 
@@ -16,6 +17,7 @@ export type UserPayload = {
 
 export type SignUpDoctorDto = z.infer<typeof signUpDoctorSchema>;
 export type SignUpPatientDto = z.infer<typeof signUpPatientSchema>;
+export type SignUpAdminDto = z.infer<typeof singUpAdminScheme>;
 export type SignInDto = z.infer<typeof signInSchema>;
 export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
