@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import {
+  validateForgotPassword,
+  validateResetPassword,
   validateSignIn,
   validateSignUpDoctor,
   validateSignUpPatient,
@@ -24,6 +26,16 @@ authRoute.post(
 );
 authRoute.post('/signin', validateSignIn, authController.signIn);
 authRoute.get('/refresh-token', authController.refreshToken);
-authRoute.get('/me', authenticateHandler, () => {});
+authRoute.get('/me', authenticateHandler, authController.getCurrentUser);
+authRoute.post(
+  '/forgot-password',
+  validateForgotPassword,
+  authController.forgotPassword,
+);
+authRoute.post(
+  '/reset-password/:token',
+  validateResetPassword,
+  authController.resetPassword,
+);
 
 export default authRoute;

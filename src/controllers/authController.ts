@@ -4,6 +4,8 @@
 import { Request, Response } from 'express';
 import { ApiResponse, HttpStatusCode } from '../types/apiType';
 import {
+  ForgotPasswordDto,
+  ResetPasswordDto,
   SignInDto,
   SignUpDoctorDto,
   SignUpPatientDto,
@@ -13,6 +15,8 @@ import authService from '../services/authService';
 import { HttpError } from '../utils/httpError';
 import jwtToken from '../utils/jwtToken';
 import { envConfig } from '../config/config';
+import userService from '../services/userService';
+import sendResetPasswordEmail from '../utils/resetPassword';
 
 const authController = {
   signUpPatient: async (
@@ -101,7 +105,10 @@ const authController = {
       // token invalid -> remove from store and cookie
       await authService.revokeRefreshToken(token);
       res.clearCookie('refreshToken');
-      throw err;
+      throw new HttpError(
+        'Invalid or expired refresh token',
+        HttpStatusCode.UNAUTHORIZED,
+      );
     }
 
     const refreshTokenRecord = await authService.findRefreshToken(token);
@@ -145,6 +152,77 @@ const authController = {
       data: {
         accessToken: newAccessToken,
       },
+    });
+  },
+  forgotPassword: async (
+    req: Request<{}, ApiResponse, ForgotPasswordDto>,
+    res: Response<ApiResponse>,
+  ): Promise<void> => {
+    const { email } = req.body;
+
+    const user = await userService.findExistingUser(email);
+
+    if (user) {
+      const payload: UserPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      };
+      const resetToken = jwtToken.generateResetPasswordToken(payload);
+      try {
+        await sendResetPasswordEmail(email, resetToken);
+      } catch (err) {
+        throw new HttpError(
+          err instanceof Error ? err.message : 'Failed to send reset email',
+          HttpStatusCode.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: 'Reset email has been sent',
+    });
+  },
+  resetPassword: async (
+    req: Request<{ token: string }, ApiResponse, ResetPasswordDto>,
+    res: Response<ApiResponse>,
+  ): Promise<void> => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const payload = jwtToken.verifyResetPasswordToken(token);
+    const user = await userService.findExistingUser(payload.email);
+
+    if (!user) {
+      throw new HttpError(
+        'Invalid reset token or user not found',
+        HttpStatusCode.BAD_REQUEST,
+      );
+    }
+
+    await authService.resetPassword(user.id, password);
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: 'Password reset successfully',
+    });
+  },
+  getCurrentUser: async (
+    req: Request,
+    res: Response<ApiResponse<any>>,
+  ): Promise<void> => {
+    const user: UserPayload = (req as any).user;
+
+    const userData = await userService.getCurrentUser(user);
+
+    if (!userData) {
+      throw new HttpError('User not found', HttpStatusCode.NOT_FOUND);
+    }
+
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: 'Current user retrieved successfully',
+      data: userData,
     });
   },
 };
