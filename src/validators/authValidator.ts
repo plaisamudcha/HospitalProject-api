@@ -26,7 +26,7 @@ export const signUpPatientSchema = z
   .object({
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
-    email: z.string().email('Invalid email address'),
+    email: z.email('Invalid email address'),
     password: z
       .string()
       .regex(
@@ -52,10 +52,15 @@ export const signUpPatientSchema = z
   });
 
 export const signInSchema = z.object({
-  email: z.string(),
+  email: z.email('Invalid email address'),
   password: z.string(),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z.email('Invalid email address'),
 });
 
 export const validateSignUpDoctor = validateHandler(signUpDoctorSchema);
 export const validateSignUpPatient = validateHandler(signUpPatientSchema);
 export const validateSignIn = validateHandler(signInSchema);
+export const validateForgotPassword = validateHandler(forgotPasswordSchema);

@@ -4,6 +4,7 @@
 import { Request, Response } from 'express';
 import { ApiResponse, HttpStatusCode } from '../types/apiType';
 import {
+  ForgotPasswordDto,
   SignInDto,
   SignUpDoctorDto,
   SignUpPatientDto,
@@ -13,6 +14,8 @@ import authService from '../services/authService';
 import { HttpError } from '../utils/httpError';
 import jwtToken from '../utils/jwtToken';
 import { envConfig } from '../config/config';
+import userService from '../services/userService';
+import sendResetPasswordEmail from '../utils/resetPassword';
 
 const authController = {
   signUpPatient: async (
@@ -101,7 +104,10 @@ const authController = {
       // token invalid -> remove from store and cookie
       await authService.revokeRefreshToken(token);
       res.clearCookie('refreshToken');
-      throw err;
+      throw new HttpError(
+        'Invalid or expired refresh token',
+        HttpStatusCode.UNAUTHORIZED,
+      );
     }
 
     const refreshTokenRecord = await authService.findRefreshToken(token);
@@ -145,6 +151,31 @@ const authController = {
       data: {
         accessToken: newAccessToken,
       },
+    });
+  },
+  forgotPassword: async (
+    req: Request<{}, ApiResponse, ForgotPasswordDto>,
+    res: Response<ApiResponse>,
+  ): Promise<void> => {
+    const { email } = req.body;
+
+    const user = await userService.findExistingUser(email);
+
+    if (!user) {
+      throw new HttpError('Email not found', HttpStatusCode.BAD_REQUEST);
+    }
+
+    const payload: UserPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
+    const resetToken = jwtToken.generateResetPasswordToken(payload);
+    await sendResetPasswordEmail(email, resetToken);
+
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: 'Reset password email sent successfully',
     });
   },
 };
