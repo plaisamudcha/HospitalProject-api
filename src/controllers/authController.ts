@@ -161,21 +161,26 @@ const authController = {
 
     const user = await userService.findExistingUser(email);
 
-    if (!user) {
-      throw new HttpError('Email not found', HttpStatusCode.BAD_REQUEST);
+    if (user) {
+      const payload: UserPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      };
+      const resetToken = jwtToken.generateResetPasswordToken(payload);
+      try {
+        await sendResetPasswordEmail(email, resetToken);
+      } catch (err) {
+        throw new HttpError(
+          err instanceof Error ? err.message : 'Failed to send reset email',
+          HttpStatusCode.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
-
-    const payload: UserPayload = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    };
-    const resetToken = jwtToken.generateResetPasswordToken(payload);
-    await sendResetPasswordEmail(email, resetToken);
 
     res.status(HttpStatusCode.OK).json({
       success: true,
-      message: 'Reset password email sent successfully',
+      message: 'Reset email has been sent',
     });
   },
 };

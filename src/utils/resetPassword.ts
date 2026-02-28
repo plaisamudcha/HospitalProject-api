@@ -19,7 +19,6 @@ const resolveTemplatePath = (filename: string) => {
 
   // If running under CommonJS, __dirname may exist — try relative to this file
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyGlobal: any = globalThis as any;
     if (typeof anyGlobal.__dirname === 'string') {
       const p = path.join(anyGlobal.__dirname, '..', 'templates', filename);
