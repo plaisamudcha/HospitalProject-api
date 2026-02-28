@@ -1,0 +1,61 @@
+meta {
+  name: HospitalApi - Auth Tests
+}
+
+# Environment (replace values as needed)
+env {
+  baseUrl = "http://localhost:3000"
+}
+
+# Sign up patient
+### Sign Up Patient
+POST {{baseUrl}}/auth/signup/patient
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "Patient",
+  "email": "test.patient@example.com",
+  "password": "password1",
+  "confirmPassword": "password1",
+  "dob": "1990-01-01",
+  "gender": "MALE",
+  "phone": "0812345678"
+}
+
+### Sign In
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "test.patient@example.com",
+  "password": "password1"
+}
+
+# After sign in capture `accessToken` from response JSON: `data.accessToken`
+# Use it in the `Authorization` header for protected routes below.
+
+### Get Current User
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### Forgot Password
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "test.patient@example.com"
+}
+
+### Reset Password
+POST {{baseUrl}}/auth/reset-password/{{resetToken}}
+Content-Type: application/json
+
+{
+  "password": "newpassword1"
+}
+
+# Notes:
+# - Replace `{{baseUrl}}` with your running server URL and port.
+# - Replace `{{accessToken}}` and `{{resetToken}}` with tokens captured from previous responses.
+# - `gender` must match enum values from the Prisma `Gender` type (e.g., MALE, FEMALE, OTHER).

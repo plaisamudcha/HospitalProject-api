@@ -1,0 +1,15 @@
+meta {
+  name: HospitalApi - Auth - Me
+}
+
+env {
+  baseUrl = "http://localhost:3000"
+}
+
+### Get Current User
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+# Notes:
+# - Capture `accessToken` from signin response and set it in your environment.
+# - Server must be running and cookie/headers correctly set for authenticated requests.

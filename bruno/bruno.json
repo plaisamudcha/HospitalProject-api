@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "name": "HospitalProject",
+  "type": "collection",
+  "description": "A collection of APIs for hospital management",
+  "ignore": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "logs",
+    "temp",
+    "*.log",
+    "*.tmp"
+  ]
+}

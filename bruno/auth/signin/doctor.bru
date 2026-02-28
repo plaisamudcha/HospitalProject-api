@@ -1,0 +1,20 @@
+meta {
+  name: HospitalApi - Auth - Signin (Doctor)
+}
+
+env {
+  baseUrl = "http://localhost:3000"
+}
+
+### Sign In Doctor
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "test.doctor@example.com",
+  "password": "password1"
+}
+
+# Notes:
+# - Doctor accounts usually created via `/auth/signup/doctor` which requires ADMIN role.
+# - Capture `data.accessToken` from the response and use it for protected routes.
