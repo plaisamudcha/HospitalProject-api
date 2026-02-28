@@ -1,0 +1,5 @@
+{
+  "invoiceId": 1,
+  "amount": 1500.0,
+  "paymentMethod": "PROMPTPAY"
+}

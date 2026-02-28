@@ -111,13 +111,6 @@ Backend API สำหรับระบบจัดการโรงพยา�
 | PATCH  | `/api/appointments/:id/status` |
 | DELETE | `/api/appointments/:id`        |
 
-Example Body:
-{
-"scheduleAt": "2026-03-01T10:00:00Z",
-"doctorId": 1,
-"patientId": 2
-}
-
 Example:
 
 - [examples/appointment.json](examples/appointment.json)
@@ -192,11 +185,8 @@ Example:
 | POST   | `/api/stock-logs`               |
 
 Example:
-{
-"medicineId": 3,
-"change": -5,
-"reason": "Prescription #22"
-}
+
+- [examples/stock-log.json](examples/stock-lock.json)
 
 ### 💰 BILLING SYSTEM
 
@@ -216,11 +206,8 @@ Payment
 | GET | `/api/patient/payments` | PATIENT |
 
 Example:
-{
-"invoiceId": 1,
-"amount": 1500.00,
-"paymentMethod": "PROMPTPAY"
-}
+
+- [examples/billing-system.json](examples/billing-system.json)
 
 ## 🔒 Security Design
 
