@@ -58,7 +58,7 @@ const sendResetPasswordEmail = async (
 
   const baseUrl =
     envConfig.FRONTEND_URL ?? `http://localhost:${envConfig.PORT}`;
-  const resetLink = `${baseUrl.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(
+  const resetLink = `${baseUrl.replace(/\/$/, '')}/reset-password/${encodeURIComponent(
     token,
   )}`;
 

@@ -60,7 +60,17 @@ export const forgotPasswordSchema = z.object({
   email: z.email('Invalid email address'),
 });
 
+export const resetPasswordSchema = z.object({
+  password: z
+    .string()
+    .regex(
+      /^[a-zA-Z0-9]{6,}$/,
+      'Password must be at least 6 characters long and contain only letters and numbers',
+    ),
+});
+
 export const validateSignUpDoctor = validateHandler(signUpDoctorSchema);
 export const validateSignUpPatient = validateHandler(signUpPatientSchema);
 export const validateSignIn = validateHandler(signInSchema);
 export const validateForgotPassword = validateHandler(forgotPasswordSchema);
+export const validateResetPassword = validateHandler(resetPasswordSchema);

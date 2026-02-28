@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   validateForgotPassword,
+  validateResetPassword,
   validateSignIn,
   validateSignUpDoctor,
   validateSignUpPatient,
@@ -30,6 +31,11 @@ authRoute.post(
   '/forgot-password',
   validateForgotPassword,
   authController.forgotPassword,
+);
+authRoute.post(
+  '/reset-password/:token',
+  validateResetPassword,
+  authController.resetPassword,
 );
 
 export default authRoute;

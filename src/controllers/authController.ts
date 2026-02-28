@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import { ApiResponse, HttpStatusCode } from '../types/apiType';
 import {
   ForgotPasswordDto,
+  ResetPasswordDto,
   SignInDto,
   SignUpDoctorDto,
   SignUpPatientDto,
@@ -181,6 +182,29 @@ const authController = {
     res.status(HttpStatusCode.OK).json({
       success: true,
       message: 'Reset email has been sent',
+    });
+  },
+  resetPassword: async (
+    req: Request<{ token: string }, ApiResponse, ResetPasswordDto>,
+    res: Response<ApiResponse>,
+  ): Promise<void> => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const payload = jwtToken.verifyResetPasswordToken(token);
+    const user = await userService.findExistingUser(payload.email);
+
+    if (!user) {
+      throw new HttpError(
+        'Invalid reset token or user not found',
+        HttpStatusCode.BAD_REQUEST,
+      );
+    }
+
+    await authService.resetPassword(user.id, password);
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: 'Password reset successfully',
     });
   },
 };

@@ -86,6 +86,17 @@ const authService = {
       },
     });
   },
+  resetPassword: async (userId: string, newPassword: string) => {
+    const hashPassword = await bcrypt.hash(
+      newPassword,
+      envConfig.BCRYPT_SALT_ROUNDS,
+    );
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashPassword },
+    });
+  },
 };
 
 export default authService;

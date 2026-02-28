@@ -75,9 +75,9 @@ Backend API สำหรับระบบจัดการโรงพยา�
 
 | Method | Endpoint                          | Auth   | Description            |
 | ------ | --------------------------------- | ------ | ---------------------- |
-| POST   | `/api/auth/login`                 | Public | Login                  |
-| POST   | `/api/auth/register/patient`      | Public | Register patient       |
-| POST   | `/api/auth/register/doctor`       | ADMIN  | Create doctor          |
+| POST   | `/api/auth/signin`                | Public | Login                  |
+| POST   | `/api/auth/signup/patient`        | Public | Register patient       |
+| POST   | `/api/auth/signup/doctor`         | ADMIN  | Create doctor          |
 | GET    | `/api/auth/me`                    | USER   | Get current user       |
 | POST   | `/api/auth/forgot-password`       | Public | Send reset link        |
 | POST   | `/api/auth/reset-password/:token` | Public | Reset password         |

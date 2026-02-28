@@ -1,6 +1,7 @@
 import z from 'zod';
 import {
   forgotPasswordSchema,
+  resetPasswordSchema,
   signInSchema,
   signUpDoctorSchema,
   signUpPatientSchema,
@@ -17,3 +18,4 @@ export type SignUpDoctorDto = z.infer<typeof signUpDoctorSchema>;
 export type SignUpPatientDto = z.infer<typeof signUpPatientSchema>;
 export type SignInDto = z.infer<typeof signInSchema>;
 export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
