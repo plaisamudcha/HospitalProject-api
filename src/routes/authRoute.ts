@@ -22,7 +22,8 @@ authRoute.post(
   validateSignUpDoctor,
   authController.signUpDoctor,
 );
-authRoute.post('/signin', validateSignIn, () => {});
+authRoute.post('/signin', validateSignIn, authController.signIn);
+authRoute.get('/refresh-token', authController.refreshToken);
 authRoute.get('/me', authenticateHandler, () => {});
 
 export default authRoute;

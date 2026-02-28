@@ -59,12 +59,30 @@ const authService = {
 
     return isPasswordValid ? user : null;
   },
-  createRefreshToken: async (userId: number, refreshToken: string) => {
+  createRefreshToken: async (userId: string, refreshToken: string) => {
     await prisma.refreshToken.create({
       data: {
         token: refreshToken,
         userId,
         expiresAt: new Date(Date.now() + envConfig.JWT_REFRESH_EXPIRES * 1000), // Set expiration time
+      },
+    });
+  },
+  findRefreshToken: async (token: string) => {
+    return await prisma.refreshToken.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+  },
+  revokeRefreshToken: async (token: string) => {
+    await prisma.refreshToken.deleteMany({ where: { token } });
+  },
+  updateRefreshToken: async (oldToken: string, newToken: string) => {
+    await prisma.refreshToken.update({
+      where: { token: oldToken },
+      data: {
+        token: newToken,
+        expiresAt: new Date(Date.now() + envConfig.JWT_REFRESH_EXPIRES * 1000), // Update expiration time
       },
     });
   },

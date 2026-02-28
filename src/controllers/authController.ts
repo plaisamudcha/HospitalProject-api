@@ -21,7 +21,7 @@ const authController = {
   ): Promise<void> => {
     await authService.signUpPatient(req.body);
 
-    res.status(201).json({
+    res.status(HttpStatusCode.CREATED).json({
       success: true,
       message: 'Patient registered successfully',
     });
@@ -32,7 +32,7 @@ const authController = {
   ): Promise<void> => {
     await authService.signUpDoctor(req.body);
 
-    res.status(201).json({
+    res.status(HttpStatusCode.CREATED).json({
       success: true,
       message: 'Doctor registered successfully',
     });
@@ -70,12 +70,80 @@ const authController = {
     });
     const { password: hashedPassword, ...userWithoutPassword } = user;
 
-    res.status(200).json({
+    res.status(HttpStatusCode.OK).json({
       success: true,
       message: 'User signed in successfully',
       data: {
         user: userWithoutPassword,
         accessToken,
+      },
+    });
+  },
+  refreshToken: async (
+    req: Request,
+    res: Response<ApiResponse<any>>,
+  ): Promise<void> => {
+    const token = (req.cookies && (req.cookies as any).refreshToken) as
+      | string
+      | undefined;
+
+    if (!token) {
+      throw new HttpError(
+        'Invalid or expired refresh token',
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    // verify JWT signature first (will throw if invalid)
+    try {
+      jwtToken.verifyRefreshToken(token);
+    } catch (err) {
+      // token invalid -> remove from store and cookie
+      await authService.revokeRefreshToken(token);
+      res.clearCookie('refreshToken');
+      throw err;
+    }
+
+    const refreshTokenRecord = await authService.findRefreshToken(token);
+
+    if (!refreshTokenRecord) {
+      res.clearCookie('refreshToken');
+      throw new HttpError(
+        'Invalid or expired refresh token',
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    if (refreshTokenRecord.expiresAt < new Date()) {
+      await authService.revokeRefreshToken(token);
+      res.clearCookie('refreshToken');
+      throw new HttpError(
+        'Invalid or expired refresh token',
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const payload: UserPayload = {
+      id: refreshTokenRecord.user.id,
+      email: refreshTokenRecord.user.email,
+      role: refreshTokenRecord.user.role,
+    };
+
+    const newRefreshToken = jwtToken.generateRefreshToken(payload);
+    const newAccessToken = jwtToken.generateToken(payload);
+
+    await authService.updateRefreshToken(token, newRefreshToken);
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: envConfig.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: envConfig.JWT_REFRESH_EXPIRES * 1000, // Set cookie expiration time
+    });
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: 'Refresh token updated successfully',
+      data: {
+        accessToken: newAccessToken,
       },
     });
   },

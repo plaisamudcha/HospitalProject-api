@@ -7,7 +7,7 @@ import {
 import { RoleType } from '@prisma/client';
 
 export type UserPayload = {
-  id: number;
+  id: string;
   email: string;
   role: RoleType;
 };
