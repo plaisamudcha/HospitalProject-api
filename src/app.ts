@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import express from 'express';
-import { errorHandler } from './middlewares/erroraHandler';
+import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFoundHandler';
 import authRoute from './routes/authRoute';
 
