@@ -79,6 +79,7 @@ Backend API สำหรับระบบจัดการโรงพยา�
 | POST   | `/api/auth/signup/patient`        | Public | Register patient       |
 | POST   | `/api/auth/signup/doctor`         | ADMIN  | Create doctor          |
 | GET    | `/api/auth/me`                    | USER   | Get current user       |
+| GET    | `api/auth/refresh-token`          | Public | Refresh token          |
 | POST   | `/api/auth/forgot-password`       | Public | Send reset link        |
 | POST   | `/api/auth/reset-password/:token` | Public | Reset password         |
 | GET    | `/api/public/doctors`             | Public | Get public doctor list |

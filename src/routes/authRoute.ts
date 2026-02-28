@@ -26,7 +26,7 @@ authRoute.post(
 );
 authRoute.post('/signin', validateSignIn, authController.signIn);
 authRoute.get('/refresh-token', authController.refreshToken);
-authRoute.get('/me', authenticateHandler, () => {});
+authRoute.get('/me', authenticateHandler, authController.getCurrentUser);
 authRoute.post(
   '/forgot-password',
   validateForgotPassword,

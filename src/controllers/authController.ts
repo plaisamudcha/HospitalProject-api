@@ -207,6 +207,24 @@ const authController = {
       message: 'Password reset successfully',
     });
   },
+  getCurrentUser: async (
+    req: Request,
+    res: Response<ApiResponse<any>>,
+  ): Promise<void> => {
+    const user: UserPayload = (req as any).user;
+
+    const userData = await userService.getCurrentUser(user);
+
+    if (!userData) {
+      throw new HttpError('User not found', HttpStatusCode.NOT_FOUND);
+    }
+
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: 'Current user retrieved successfully',
+      data: userData,
+    });
+  },
 };
 
 export default authController;
