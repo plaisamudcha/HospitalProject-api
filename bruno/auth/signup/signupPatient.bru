@@ -1,0 +1,30 @@
+meta {
+  name: signupPatient
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BASE_URL}}/api/auth/signup/patient
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "patient",
+    "lastName": "samudcha",
+    "email": "patient@hotmail.com",
+    "password": "123456",
+    "confirmPassword": "123456",
+    "profileImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuNhTZJTtkR6b-    ADMhmzPvVwaLuLdz273wvQ&s",
+    "dob": "1994-04-01T22:30:00+07:00",
+    "gender": "MALE",
+    "phone": "0854216532"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
