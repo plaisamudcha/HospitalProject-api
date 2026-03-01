@@ -1,19 +1,20 @@
 meta {
-  name: signinAdmin
+  name: signinDoctor
   type: http
-  seq: 1
+  seq: 2
 }
 
 post {
   url: {{BASE_URL}}/api/auth/signin
   body: json
-  auth: none
+  auth: inherit
 }
 
 body:json {
   {
-    "email": "plai_samudcha@hotmail.com",
+    "email": "doctor@hotmail.com",
     "password": "123456"
+    
   }
 }
 

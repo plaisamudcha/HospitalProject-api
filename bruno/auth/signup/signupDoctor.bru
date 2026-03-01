@@ -1,0 +1,32 @@
+meta {
+  name: signupDoctor
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL}}/api/auth/signup/doctor
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+  "firstName": "doctor",
+  "lastName": "samudcha",
+  "email": "doctor@hotmail.com",
+  "password": "123456",
+  "confirmPassword": "123456",
+  "profileImage": "https://media.gettyimages.com/id/1317804578/photo/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=gi&k=20&c=tFkDOWmEyqXQmUHNxkuR5TsmRVLi5VZXYm3mVsjee0E=",
+  "specialization": "CARDIOLOGY"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
