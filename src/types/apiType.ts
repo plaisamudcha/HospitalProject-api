@@ -29,4 +29,27 @@ export type ErrorApiResponse = {
   detail?: any;
 };
 
+export type PaginationResponseData<T> = {
+  datas: T[];
+  total: number;
+  totalPages: number;
+  page: number;
+  pageSize: number;
+};
+
+export type PaginationResponse<T> =
+  | SuccessApiResponse<PaginationResponseData<T>>
+  | ErrorApiResponse;
+
+export type QuerySearch<T> = {
+  filter?: T | null;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  sorting?: string;
+  desc?: boolean;
+  page: number;
+  pageSize: number;
+};
+
 export type ApiResponse<T = void> = SuccessApiResponse<T> | ErrorApiResponse;

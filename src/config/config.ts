@@ -16,6 +16,8 @@ const envSchema = z.object({
   JWT_EXPIRES: z.coerce.number().min(1),
   JWT_REFRESH_EXPIRES: z.coerce.number().min(1),
   BCRYPT_SALT_ROUNDS: z.coerce.number().min(1),
+  DEFAULT_PAGE_SIZE: z.coerce.number().min(1),
+  DEFAULT_PAGE_NUMBER: z.coerce.number().min(1),
 });
 
 const { success, data, error } = envSchema.safeParse(process.env);
