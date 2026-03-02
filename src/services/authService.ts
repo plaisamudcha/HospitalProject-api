@@ -4,7 +4,7 @@ import {
   SignUpDoctorDto,
   SignUpPatientDto,
 } from '../types/authType';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import prisma from '../config/prisma';
 import { envConfig } from '../config/config';
 import userService from './userService';

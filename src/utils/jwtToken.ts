@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import jwt from 'jsonwebtoken';
 import { UserPayload } from '../types/authType';
 import { envConfig } from '../config/config';

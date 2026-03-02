@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 import { HttpError } from '../utils/httpError';
 import { ErrorApiResponse, HttpStatusCode } from '../types/apiType';
