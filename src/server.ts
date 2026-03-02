@@ -1,5 +1,6 @@
 import app from './app';
 import { envConfig } from './config/config';
+import { transporter } from './utils/resetPassword';
 
 type ListenError = Error & {
   syscall?: string;
@@ -7,6 +8,15 @@ type ListenError = Error & {
 };
 
 type ShutdownSignal = 'SIGINT' | 'SIGTERM';
+
+transporter
+  .verify()
+  .then(() => {
+    console.log('Email transporter is ready to send messages');
+  })
+  .catch((err) => {
+    console.warn('Email transporter verification failed:', err);
+  });
 
 const server = app.listen(envConfig.PORT, () => {
   console.log(

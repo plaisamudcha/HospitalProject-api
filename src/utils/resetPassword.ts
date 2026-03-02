@@ -32,8 +32,10 @@ const resolveTemplatePath = (filename: string) => {
   return candidates[0];
 };
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
+export const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: envConfig.EMAIL_USER,
     pass: envConfig.EMAIL_PASS,
@@ -63,12 +65,6 @@ const sendResetPasswordEmail = async (
   )}`;
 
   html = html.replace(/{{RESET_LINK}}/g, resetLink);
-
-  try {
-    await transporter.verify();
-  } catch (err) {
-    console.warn('Email transporter verification failed:', err);
-  }
 
   try {
     await transporter.sendMail({

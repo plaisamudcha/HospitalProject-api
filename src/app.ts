@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFoundHandler';
 import authRoute from './routes/authRoute';
@@ -8,6 +9,7 @@ import { authenticateHandler } from './middlewares/authenticateHandler';
 
 const app = express();
 
+app.use(helmet());
 app.use(express.json());
 
 app.use('/api/auth', authRoute);
